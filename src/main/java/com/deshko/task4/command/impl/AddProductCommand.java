@@ -10,6 +10,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 
 public class AddProductCommand implements Command {
+    private static final String PATH_PRODUCTS = "/controller?command=VIEW_PRODUCTS";
+    private static final String PATH_ADD_PRODUCT_PAGE = "/WEB-INF/pages/add_product.jsp";
+
     @Override
     public Router execute(HttpServletRequest request) throws CommandException {
         String name = request.getParameter("name");
@@ -23,11 +26,11 @@ public class AddProductCommand implements Command {
             product.setPrice(new BigDecimal(priceStr));
             ProductServiceImpl.getInstance().addProduct(product);
 
-            return new Router(request.getContextPath() + "/controller?command=VIEW_PRODUCTS", Router.Type.REDIRECT);
+            return new Router(request.getContextPath() + PATH_PRODUCTS, Router.Type.REDIRECT);
 
         } catch (ServiceException | NumberFormatException e) {
-            request.setAttribute("errorMessage", "Ошибка добавления товара. Проверьте корректность цены.");
-            return new Router("/WEB-INF/pages/admin/add_product.jsp", Router.Type.FORWARD);
+            request.setAttribute("errorMessage", "Error adding the product. Check that the price is correct");
+            return new Router(PATH_ADD_PRODUCT_PAGE, Router.Type.FORWARD);
         }
     }
 }

@@ -29,20 +29,15 @@ public class Controller extends HttpServlet {
 
         try {
             Router router = command.execute(request);
+            String page = router.getPage();
 
-            if (router != null) {
-                String page = router.getPage();
-                if (router.getType() == Router.Type.FORWARD) {
-                    request.getRequestDispatcher(page).forward(request, response);
-                } else {
-                    response.sendRedirect(page);
-                }
+            if (router.getType() == Router.Type.FORWARD) {
+                request.getRequestDispatcher(page).forward(request, response);
             } else {
-                response.sendRedirect(request.getContextPath() + "/index.jsp");
+                response.sendRedirect(page);
             }
 
         } catch (CommandException e) {
-            e.printStackTrace();
             throw new ServletException("Application error during command execution", e);
         }
     }

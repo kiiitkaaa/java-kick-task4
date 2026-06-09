@@ -9,18 +9,21 @@ import com.deshko.task4.service.impl.OrderServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 
 public class MakeOrderCommand implements Command {
+    private static final String PATH_INDEX = "/index.jsp";
+    private static final String PATH_ORDERS = "/controller?command=VIEW_MY_ORDERS";
+
     @Override
     public Router execute(HttpServletRequest request) throws CommandException {
         Long productId = Long.valueOf(request.getParameter("productId"));
         User currentUser = (User) request.getSession().getAttribute("user");
 
         if (currentUser == null) {
-            return new Router(request.getContextPath() + "/index.jsp", Router.Type.REDIRECT);
+            return new Router(request.getContextPath() + PATH_INDEX, Router.Type.REDIRECT);
         }
 
         try {
             OrderServiceImpl.getInstance().makeOrder(currentUser.getId(), productId);
-            return new Router(request.getContextPath() + "/controller?command=VIEW_MY_ORDERS", Router.Type.REDIRECT);
+            return new Router(request.getContextPath() + PATH_ORDERS, Router.Type.REDIRECT);
         } catch (ServiceException e) {
             throw new CommandException("Failed to make order", e);
         }

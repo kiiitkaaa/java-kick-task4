@@ -11,6 +11,9 @@ import jakarta.servlet.http.HttpSession;
 import java.util.Optional;
 
 public class LoginCommand implements Command {
+    private static final String PATH_PRODUCTS = "/controller?command=VIEW_PRODUCTS";
+    private static final String PATH_LOGIN = "/WEB-INF/pages/login.jsp";
+
     @Override
     public Router execute(HttpServletRequest request) throws CommandException {
         String login = request.getParameter("login");
@@ -23,10 +26,10 @@ public class LoginCommand implements Command {
                 HttpSession session = request.getSession();
                 session.setAttribute("user", userOpt.get());
 
-                return new Router(request.getContextPath() + "/controller?command=VIEW_PRODUCTS", Router.Type.REDIRECT);
+                return new Router(request.getContextPath() + PATH_PRODUCTS, Router.Type.REDIRECT);
             } else {
-                request.setAttribute("errorMessage", "Неверный логин или пароль");
-                return new Router("/WEB-INF/pages/login.jsp", Router.Type.FORWARD);
+                request.setAttribute("errorMessage", "Invalid username or password");
+                return new Router(PATH_LOGIN, Router.Type.FORWARD);
             }
         } catch (ServiceException e) {
             throw new CommandException("Error executing LoginCommand", e);

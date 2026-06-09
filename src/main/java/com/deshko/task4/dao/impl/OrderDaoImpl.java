@@ -3,9 +3,8 @@ package com.deshko.task4.dao.impl;
 import com.deshko.task4.dao.BaseDao;
 import com.deshko.task4.dao.OrderDao;
 import com.deshko.task4.entity.Order;
-import com.deshko.task4.entity.Product;
-import com.deshko.task4.entity.User;
 import com.deshko.task4.exception.DaoException;
+import com.deshko.task4.mapper.impl.OrderMapper;
 import com.deshko.task4.pool.ConnectionPool;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,6 +22,7 @@ public class OrderDaoImpl implements BaseDao<Order>, OrderDao {
     private static final String SQL_UPDATE = "UPDATE orders SET user_id = ?, product_id = ?, status = ? WHERE id = ?";
     private static final String SQL_DELETE = "DELETE FROM orders WHERE id = ?";
     private static final OrderDaoImpl INSTANCE = new OrderDaoImpl();
+    private final OrderMapper mapper = new OrderMapper();
 
     private OrderDaoImpl() {}
 
@@ -38,7 +38,7 @@ public class OrderDaoImpl implements BaseDao<Order>, OrderDao {
             statement.setLong(1, userId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    orders.add(mapRow(resultSet));
+                    orders.add(mapper.mapRow(resultSet));
                 }
             }
         } catch (SQLException e) {
@@ -56,7 +56,7 @@ public class OrderDaoImpl implements BaseDao<Order>, OrderDao {
         try (PreparedStatement statement = connection.prepareStatement(SQL_FIND_ALL);
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
-                orders.add(mapRow(resultSet));
+                orders.add(mapper.mapRow(resultSet));
             }
         } catch (SQLException e) {
             throw new DaoException("Failed to find all orders", e);
@@ -73,7 +73,7 @@ public class OrderDaoImpl implements BaseDao<Order>, OrderDao {
             statement.setLong(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    return Optional.of(mapRow(resultSet));
+                    return Optional.of(mapper.mapRow(resultSet));
                 }
             }
         } catch (SQLException e) {
@@ -129,21 +129,5 @@ public class OrderDaoImpl implements BaseDao<Order>, OrderDao {
         } finally {
             ConnectionPool.getInstance().releaseConnection(connection);
         }
-    }
-
-    private Order mapRow(ResultSet rs) throws SQLException {
-        Order order = new Order();
-        order.setId(rs.getLong("id"));
-        order.setStatus(rs.getString("status"));
-
-        User userProxy = new User();
-        userProxy.setId(rs.getLong("user_id"));
-        order.setUser(userProxy);
-
-        Product productProxy = new Product();
-        productProxy.setId(rs.getLong("product_id"));
-        order.setProduct(productProxy);
-
-        return order;
     }
 }

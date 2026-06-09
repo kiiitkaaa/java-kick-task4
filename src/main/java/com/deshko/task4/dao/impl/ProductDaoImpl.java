@@ -4,6 +4,7 @@ import com.deshko.task4.dao.BaseDao;
 import com.deshko.task4.dao.ProductDao;
 import com.deshko.task4.entity.Product;
 import com.deshko.task4.exception.DaoException;
+import com.deshko.task4.mapper.impl.ProductMapper;
 import com.deshko.task4.pool.ConnectionPool;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +19,7 @@ public class ProductDaoImpl implements BaseDao<Product>, ProductDao {
     private static final String SQL_UPDATE = "UPDATE products SET name = ?, description = ?, price = ?, is_active = ? WHERE id = ?";
     private static final String SQL_DELETE = "DELETE FROM products WHERE id = ?";
     private static final ProductDaoImpl INSTANCE = new ProductDaoImpl();
+    private final ProductMapper mapper = new ProductMapper();
 
     private ProductDaoImpl() {}
 
@@ -42,7 +44,7 @@ public class ProductDaoImpl implements BaseDao<Product>, ProductDao {
             statement.setLong(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    return Optional.of(mapRow(resultSet));
+                    return Optional.of(mapper.mapRow(resultSet));
                 }
             }
         } catch (SQLException e) {
@@ -108,7 +110,7 @@ public class ProductDaoImpl implements BaseDao<Product>, ProductDao {
         try (PreparedStatement statement = connection.prepareStatement(query);
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
-                products.add(mapRow(resultSet));
+                products.add(mapper.mapRow(resultSet));
             }
         } catch (SQLException e) {
             throw new DaoException("Failed to execute product list query", e);
@@ -116,15 +118,5 @@ public class ProductDaoImpl implements BaseDao<Product>, ProductDao {
             ConnectionPool.getInstance().releaseConnection(connection);
         }
         return products;
-    }
-
-    private Product mapRow(ResultSet rs) throws SQLException {
-        Product product = new Product();
-        product.setId(rs.getLong("id"));
-        product.setName(rs.getString("name"));
-        product.setDescription(rs.getString("description"));
-        product.setPrice(rs.getBigDecimal("price"));
-        product.setActive(rs.getBoolean("is_active"));
-        return product;
     }
 }

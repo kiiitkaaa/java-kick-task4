@@ -4,6 +4,7 @@ import com.deshko.task4.dao.BaseDao;
 import com.deshko.task4.dao.UserDao;
 import com.deshko.task4.entity.User;
 import com.deshko.task4.exception.DaoException;
+import com.deshko.task4.mapper.impl.UserMapper;
 import com.deshko.task4.pool.ConnectionPool;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,6 +22,7 @@ public class UserDaoImpl implements BaseDao<User>, UserDao {
     private static final String SQL_UPDATE = "UPDATE users SET login = ?, password_hash = ?, role = ? WHERE id = ?";
     private static final String SQL_DELETE = "DELETE FROM users WHERE id = ?";
     private static final UserDaoImpl INSTANCE = new UserDaoImpl();
+    private final UserMapper mapper = new UserMapper();
 
     private UserDaoImpl() {}
 
@@ -35,7 +37,7 @@ public class UserDaoImpl implements BaseDao<User>, UserDao {
             statement.setString(1, login);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    return Optional.of(mapRow(resultSet));
+                    return Optional.of(mapper.mapRow(resultSet));
                 }
             }
         } catch (SQLException e) {
@@ -53,7 +55,7 @@ public class UserDaoImpl implements BaseDao<User>, UserDao {
         try (PreparedStatement statement = connection.prepareStatement(SQL_FIND_ALL);
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
-                users.add(mapRow(resultSet));
+                users.add(mapper.mapRow(resultSet));
             }
         } catch (SQLException e) {
             throw new DaoException("Failed to find all users", e);
@@ -70,7 +72,7 @@ public class UserDaoImpl implements BaseDao<User>, UserDao {
             statement.setLong(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    return Optional.of(mapRow(resultSet));
+                    return Optional.of(mapper.mapRow(resultSet));
                 }
             }
         } catch (SQLException e) {
@@ -100,7 +102,7 @@ public class UserDaoImpl implements BaseDao<User>, UserDao {
         try (PreparedStatement statement = connection.prepareStatement(SQL_CREATE)) {
             statement.setString(1, entity.getLogin());
             statement.setString(2, entity.getPasswordHash());
-            statement.setString(3, entity.getRole());
+            statement.setString(3, entity.getRole().name());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new DaoException("Failed to create user", e);
@@ -115,8 +117,8 @@ public class UserDaoImpl implements BaseDao<User>, UserDao {
         try (PreparedStatement statement = connection.prepareStatement(SQL_UPDATE)) {
             statement.setString(1, entity.getLogin());
             statement.setString(2, entity.getPasswordHash());
-            statement.setString(3, entity.getRole());
-            statement.setLong(4, entity.getId()); // Из AbstractEntity
+            statement.setString(3, entity.getRole().name());
+            statement.setLong(4, entity.getId());
             if (statement.executeUpdate() == 0) {
                 throw new DaoException("Update failed, user not found");
             }
@@ -126,14 +128,5 @@ public class UserDaoImpl implements BaseDao<User>, UserDao {
         } finally {
             ConnectionPool.getInstance().releaseConnection(connection);
         }
-    }
-
-    private User mapRow(ResultSet rs) throws SQLException {
-        User user = new User();
-        user.setId(rs.getLong("id"));
-        user.setLogin(rs.getString("login"));
-        user.setPasswordHash(rs.getString("password_hash"));
-        user.setRole(rs.getString("role"));
-        return user;
     }
 }

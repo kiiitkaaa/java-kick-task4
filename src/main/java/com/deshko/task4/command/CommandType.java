@@ -13,7 +13,8 @@ public enum CommandType {
     DELETE_PRODUCT(new DeleteProductCommand()),
     MAKE_ORDER(new MakeOrderCommand()),
     VIEW_MY_ORDERS(new ViewMyOrdersCommand()),
-    CANCEL_ORDER(new CancelOrderCommand());
+    CANCEL_ORDER(new CancelOrderCommand()),
+    TO_ADD_PRODUCT_PAGE(new ToAddProductPageCommand());
 
     private final Command command;
 
@@ -26,7 +27,7 @@ public enum CommandType {
     }
 
     public static Command defineCommand(String commandStr) {
-        if (commandStr == null || commandStr.isEmpty()) {
+        if (commandStr == null || commandStr.isBlank()) {
             return VIEW_PRODUCTS.getCommand();
         }
         try {

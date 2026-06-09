@@ -1,6 +1,7 @@
 package com.deshko.task4.service.impl;
 
 import com.deshko.task4.dao.impl.UserDaoImpl;
+import com.deshko.task4.entity.Role;
 import com.deshko.task4.entity.User;
 import com.deshko.task4.exception.DaoException;
 import com.deshko.task4.exception.ServiceException;
@@ -47,7 +48,7 @@ public class UserServiceImpl implements UserService {
             User user = new User();
             user.setLogin(login);
             user.setPasswordHash(PasswordHasher.hash(password));
-            user.setRole("CLIENT");
+            user.setRole(Role.CLIENT);
 
             return UserDaoImpl.getInstance().create(user);
         } catch (DaoException e) {

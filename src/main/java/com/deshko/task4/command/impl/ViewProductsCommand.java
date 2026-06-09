@@ -10,13 +10,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public class ViewProductsCommand implements Command {
+    private static final String PATH_CATALOG = "/WEB-INF/pages/catalog.jsp";
+
     @Override
     public Router execute(HttpServletRequest request) throws CommandException {
         try {
             List<Product> products = ProductServiceImpl.getInstance().getAllProducts();
             request.setAttribute("products", products);
 
-            return new Router("/WEB-INF/pages/catalog.jsp", Router.Type.FORWARD);
+            return new Router(PATH_CATALOG, Router.Type.FORWARD);
         } catch (ServiceException e) {
             throw new CommandException("Error executing ViewProductsCommand", e);
         }

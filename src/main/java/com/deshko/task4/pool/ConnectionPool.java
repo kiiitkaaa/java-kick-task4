@@ -25,6 +25,7 @@ public class ConnectionPool {
         Properties properties = new Properties();
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(PROPERTIES_FILE)) {
             if (inputStream == null) {
+                logger.fatal("Database properties file not found");
                 throw new RuntimeException("Database properties file not found: " + PROPERTIES_FILE);
             }
             properties.load(inputStream);

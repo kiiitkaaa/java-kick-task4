@@ -8,6 +8,9 @@ import com.deshko.task4.service.impl.UserServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 
 public class SignUpCommand implements Command {
+    private static final String PATH_INDEX = "/index.jsp";
+    private static final String PATH_SIGNUP = "/WEB-INF/pages/signup.jsp";
+
     @Override
     public Router execute(HttpServletRequest request) throws CommandException {
         String login = request.getParameter("login");
@@ -17,14 +20,14 @@ public class SignUpCommand implements Command {
         try {
             boolean isRegistered = UserServiceImpl.getInstance().register(login, pass, passConfirm);
             if (isRegistered) {
-                return new Router(request.getContextPath() + "/index.jsp", Router.Type.REDIRECT);
+                return new Router(request.getContextPath() + PATH_INDEX, Router.Type.REDIRECT);
             } else {
-                request.setAttribute("errorMessage", "Ошибка при регистрации");
-                return new Router("/WEB-INF/pages/signup.jsp", Router.Type.FORWARD);
+                request.setAttribute("errorMessage", "Registration error");
+                return new Router(PATH_SIGNUP, Router.Type.FORWARD);
             }
         } catch (ServiceException e) {
             request.setAttribute("errorMessage", e.getMessage());
-            return new Router("/WEB-INF/pages/signup.jsp", Router.Type.FORWARD);
+            return new Router(PATH_SIGNUP, Router.Type.FORWARD);
         }
     }
 }
