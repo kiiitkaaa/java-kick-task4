@@ -3,8 +3,11 @@ package com.deshko.task4.util;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class PasswordHasher {
+    private static final Logger logger = LogManager.getLogger(PasswordHasher.class);
     private static final String ALGORITHM = "SHA-256";
 
     public static String hash(String password) {
@@ -19,6 +22,8 @@ public class PasswordHasher {
             }
             return hexString.toString();
         } catch (NoSuchAlgorithmException e) {
+            logger.fatal("Critical error: Algorithm '{}' not found for password hashing.",
+                    ALGORITHM, e);
             throw new ExceptionInInitializerError(e);
         }
     }

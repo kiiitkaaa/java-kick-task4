@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -116,9 +117,9 @@ public class ConnectionPool {
     }
 
     private void deregisterDrivers() {
-        java.util.Enumeration<java.sql.Driver> drivers = DriverManager.getDrivers();
+        java.util.Enumeration<Driver> drivers = DriverManager.getDrivers();
         while (drivers.hasMoreElements()) {
-            java.sql.Driver driver = drivers.nextElement();
+            Driver driver = drivers.nextElement();
             try {
                 DriverManager.deregisterDriver(driver);
             } catch (SQLException e) {

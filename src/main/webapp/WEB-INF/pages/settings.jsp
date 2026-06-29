@@ -12,6 +12,27 @@
         .error { color: red; margin-bottom: 15px; }
         .success { color: green; margin-bottom: 15px; }
     </style>
+
+    <script>
+        function validateForm() {
+            var newPassword = document.getElementById("newPassword").value;
+            var confirmPassword = document.getElementById("confirmPassword").value;
+            var jsErrorDiv = document.getElementById("js-error");
+
+            if (newPassword !== confirmPassword) {
+                jsErrorDiv.innerText = "Пароли не совпадают!";
+                return false;
+            }
+
+            if (newPassword.length < 6) {
+                jsErrorDiv.innerText = "Пароль слишком короткий!";
+                return false;
+            }
+
+            jsErrorDiv.innerText = "";
+            return true;
+        }
+    </script>
 </head>
 <body>
 
@@ -25,6 +46,8 @@
 <div class="form-container">
     <h3>Смена пароля</h3>
 
+    <div id="js-error" class="error"></div>
+
     <c:if test="${not empty errorMessage}">
         <div class="error">${errorMessage}</div>
     </c:if>
@@ -32,12 +55,12 @@
         <div class="success">${successMessage}</div>
     </c:if>
 
-    <form action="${pageContext.request.contextPath}/controller" method="post">
+    <form action="${pageContext.request.contextPath}/controller" method="post" onsubmit="return validateForm()">
         <input type="hidden" name="command" value="UPDATE_PASSWORD">
 
         <div class="form-group">
             <label for="newPassword">Новый пароль:</label>
-            <input type="password" id="newPassword" name="newPassword" required>
+            <input type="password" id="newPassword" name="newPassword" minlength="6" required>
         </div>
 
         <div class="form-group">
